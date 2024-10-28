@@ -8,49 +8,40 @@ use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
-    public function index()
-    {
-        $following_ids = auth()->user()->following()->pluck('users.id');
-
-        $posts = Post::whereIn('user_id', $following_ids)
-            ->orWhereHas('likes', '>', 0)
-            ->with(['user', 'likes'])
-            ->orderByDesc('created_at')
-            ->paginate(10);
-
-        return view('posts.index', compact('posts'));
-    }
-
-    public function create()
-    {
-        return view('posts.create');
-    }
-
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'image' => 'required|image|max:2048',
-            'caption' => 'nullable|string|max:1000',
+        $data = $request->validate([
+            'caption' => 'nullable|string|max:2200',
+            'image' => 'required|image|max:2048'
         ]);
 
-        $path = $request->file('image')->store('posts', 'public');
+        if ($request->hasFile('image')) {
+            // Génère un nom unique pour le fichier
+            $fileName = time() . '_' . $request->file('image')->getClientOriginalName();
 
-        auth()->user()->posts()->create([
-            'image' => $path,
-            'caption' => $validated['caption'],
-        ]);
+            // Stocke l'image
+            $path = $request->file('image')->storeAs('posts', $fileName, 'public');
+            $data['image'] = $path;
+        }
 
-        return redirect()->route('posts.index');
+        auth()->user()->posts()->create($data);
+
+        return redirect()->route('profile.show', auth()->user())
+            ->with('status', 'Post créé avec succès!');
     }
 
-    public function show(Post $post)
+    public function destroy(Post $post)
     {
-        return view('posts.show', compact('post'));
-    }
+        // Vérifie si l'utilisateur est autorisé à supprimer ce post
+        $this->authorize('delete', $post);
 
-    public function like(Post $post)
-    {
-        auth()->user()->likes()->toggle($post->id);
-        return back();
+        // Supprime l'image du post
+        if ($post->image) {
+            Storage::disk('public')->delete($post->image);
+        }
+
+        $post->delete();
+
+        return back()->with('status', 'Post supprimé avec succès!');
     }
 }
