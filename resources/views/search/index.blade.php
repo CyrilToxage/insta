@@ -42,8 +42,7 @@
                     <div class="grid grid-cols-3 gap-4">
                         @foreach ($posts as $post)
                             <a href="{{ route('posts.show', $post) }}" class="aspect-square">
-                                <img src="{{ Storage::url($post->image) }}" alt="Post"
-                                    class="w-full h-full object-cover">
+                                <img src="{{ asset($post->image) }}" alt="Post" class="w-full h-full object-cover">
                             </a>
                         @endforeach
                     </div>
