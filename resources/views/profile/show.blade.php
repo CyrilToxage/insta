@@ -71,8 +71,7 @@
                     @foreach ($posts as $post)
                         <div class="aspect-square relative group">
                             <a href="{{ route('posts.show', $post) }}" class="block w-full h-full">
-                                <img src="{{ Storage::url($post->image) }}" alt="Publication"
-                                    class="w-full h-full object-cover">
+                                <img src="{{ asset($post->image) }}" alt="Post" class="w-full h-full object-cover">
 
                                 {{-- Overlay avec les statistiques au survol --}}
                                 <div
