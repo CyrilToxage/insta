@@ -20,7 +20,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     // Page d'accueil de l'application (feed)
-    Route::get('/home', [PostController::class, 'index'])->name('home');
+    Route::get('/', [PostController::class, 'index'])->name('home');
 
     // Routes pour les posts
     Route::controller(PostController::class)->group(function () {

@@ -13,6 +13,22 @@ use App\Models\User;
 
 class ProfileController extends Controller
 {
+    public function show(User $user): View
+    {
+        $posts = $user->posts()->latest()->paginate(12);
+        return view('profile.show', [
+            'user' => $user,
+            'posts' => $posts,
+        ]);
+    }
+
+    public function edit(Request $request): View
+    {
+        return view('profile.edit', [
+            'user' => $request->user(),
+        ]);
+    }
+
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
@@ -25,20 +41,8 @@ class ProfileController extends Controller
             }
 
             // Stocke la nouvelle photo
-            $path = $request->file('profile_photo')->store('profile-photos', 'public');
-            $data['profile_photo'] = $path;
-        }
-
-        if ($request->hasFile('profile_photo')) {
-            // Traitement de l'image
-            $image = $request->file('profile_photo');
-
-            // Génère un nom unique pour le fichier
-            $fileName = time() . '_' . $image->getClientOriginalName();
-
-            // Stocke l'image
-            $path = $image->storeAs('profile-photos', $fileName, 'public');
-            $data['profile_photo'] = $path;
+            $data['profile_photo'] = $request->file('profile_photo')
+                                    ->store('profile-photos', 'public');
         }
 
         if ($user->email !== $data['email']) {
@@ -51,7 +55,6 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
-    // Pour supprimer un compte et ses fichiers associés
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [
@@ -60,17 +63,8 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        // Supprime la photo de profil
         if ($user->profile_photo) {
             Storage::disk('public')->delete($user->profile_photo);
-        }
-
-        // Supprime toutes les photos des posts
-        foreach ($user->posts as $post) {
-            if ($post->image) {
-                Storage::disk('public')->delete($post->image);
-            }
-            $post->delete();
         }
 
         Auth::logout();
@@ -80,5 +74,21 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function follow(User $user): RedirectResponse
+    {
+        if (Auth::id() === $user->id) {
+            return back();
+        }
+
+        Auth::user()->following()->attach($user->id);
+        return back();
+    }
+
+    public function unfollow(User $user): RedirectResponse
+    {
+        Auth::user()->following()->detach($user->id);
+        return back();
     }
 }

@@ -11,49 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Modification de la table users existante
-        if (Schema::hasTable('users')) {
-            Schema::table('users', function (Blueprint $table) {
-                $table->string('username')->unique()->nullable()->after('name');
-                $table->string('profile_photo')->nullable()->after('username');
-                $table->text('bio')->nullable()->after('profile_photo');
-            });
-        }
-
-        // Table des posts
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('image');
-            $table->text('caption')->nullable();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
             $table->timestamps();
         });
 
-        // Table des followers
-        Schema::create('followers', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('follower_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('followed_id')->constrained('users')->onDelete('cascade');
-            $table->timestamps();
-            $table->unique(['follower_id', 'followed_id']);
-        });
-
-        // Table des likes
-        Schema::create('likes', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('post_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
-            $table->unique(['user_id', 'post_id']);
-        });
-
-        // Table des commentaires
-        Schema::create('comments', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('post_id')->constrained()->onDelete('cascade');
-            $table->text('content');
-            $table->timestamps();
+        Schema::create('sessions', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->integer('last_activity')->index();
         });
     }
 
@@ -62,17 +36,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Suppression des tables dans l'ordre inverse pour respecter les contraintes de clés étrangères
-        Schema::dropIfExists('comments');
-        Schema::dropIfExists('likes');
-        Schema::dropIfExists('followers');
-        Schema::dropIfExists('posts');
-
-        // Suppression des colonnes ajoutées à la table users
-        if (Schema::hasTable('users')) {
-            Schema::table('users', function (Blueprint $table) {
-                $table->dropColumn(['username', 'profile_photo', 'bio']);
-            });
-        }
+        Schema::dropIfExists('users');
+        Schema::dropIfExists('sessions');
     }
 };

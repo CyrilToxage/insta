@@ -15,6 +15,17 @@ class Post extends Model
         'caption',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($post) {
+            if(!$post->user_id) {
+                $post->user_id = auth()->id();
+            }
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
