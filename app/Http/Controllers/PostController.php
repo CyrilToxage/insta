@@ -28,52 +28,37 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validation de base
-        $data = $request->validate([
+        // Validation
+        $request->validate([
             'caption' => 'nullable|string|max:2200',
             'image' => 'required|image|max:2048'
         ]);
 
-        // 2. Vérification de l'image
-        if (!$request->hasFile('image')) {
-            return back()->withErrors(['image' => 'Aucune image n\'a été envoyée.']);
-        }
-
+        // Récupération du fichier
         $file = $request->file('image');
-        if (!$file->isValid()) {
-            return back()->withErrors(['image' => 'L\'image n\'est pas valide.']);
-        }
 
-        try {
-            // 3. Création du dossier si nécessaire
-            if (!Storage::disk('public')->exists('posts')) {
-                Storage::disk('public')->makeDirectory('posts');
-            }
+        // Création d'un nom unique pour l'image
+        $filename = uniqid() . '.' . $file->getClientOriginalExtension();
 
-            // 4. Stockage de l'image avec un nom unique
-            $extension = $file->getClientOriginalExtension();
-            $fileName = time() . '_' . uniqid() . '.' . $extension;
+        // Déplacement du fichier vers le dossier public
+        $file->move(public_path('images/posts'), $filename);
 
-            // 5. Stockage direct avec le path complet
-            $file->storeAs('public/posts', $fileName);
-            $data['image'] = 'posts/' . $fileName;
+        // Création du post dans la base de données
+        $post = Post::create([
+            // ID de l'utilisateur qui crée le post
+            'user_id' => auth()->id(),
 
-            // 6. Création du post
-            $post = auth()->user()->posts()->create([
-                'image' => $data['image'],
-                'caption' => $data['caption']
-            ]);
+            // Chemin de l'image (sera utilisé pour afficher l'image plus tard)
+            'image' => 'images/posts/' . $filename,
 
-            // 7. Redirection en cas de succès
-            return redirect()
-                ->route('profile.show', auth()->user())
-                ->with('status', 'Post créé avec succès!');
+            // Texte de la légende (peut être null si pas de légende)
+            'caption' => $request->caption
+        ]);
 
-        } catch (\Exception $e) {
-            return back()
-                ->withInput()
-                ->withErrors(['error' => 'Erreur: ' . $e->getMessage()]);
-        }
+        // Redirection vers le profil de l'utilisateur
+        return redirect()
+            ->route('profile.show', auth()->user())  // Route avec l'utilisateur comme paramètre
+            ->with('status', 'Post créé avec succès!');  // Message de succès
     }
 
     public function show(Post $post)

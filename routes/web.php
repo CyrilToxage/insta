@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 // Page d'accueil pour les invités
 Route::get('/', function () {
-    return view('welcome');
+    return auth()->check() ? redirect()->route('home') : view('welcome');
 });
 
 // Routes protégées par l'authentification
@@ -20,7 +20,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     // Page d'accueil de l'application (feed)
-    Route::get('/', [PostController::class, 'index'])->name('home');
+    Route::get('/home', [PostController::class, 'index'])->name('home');
 
     // Routes pour les posts
     Route::controller(PostController::class)->group(function () {
