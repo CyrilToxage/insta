@@ -29,31 +29,46 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function update(ProfileUpdateRequest $request): RedirectResponse
-    {
-        $user = $request->user();
-        $data = $request->validated();
+    public function update(ProfileUpdateRequest $request)
+{
+    $user = $request->user();
+    $data = $request->validated();
 
-        if ($request->hasFile('profile_photo')) {
-            // Supprime l'ancienne photo si elle existe
-            if ($user->profile_photo) {
-                Storage::disk('public')->delete($user->profile_photo);
+    if ($request->hasFile('profile_photo')) {
+        // Supprimer l'ancienne photo si elle existe
+        if ($user->profile_photo) {
+            $oldPath = public_path($user->profile_photo);
+            if (file_exists($oldPath)) {
+                unlink($oldPath);
             }
-
-            // Stocke la nouvelle photo
-            $data['profile_photo'] = $request->file('profile_photo')
-                ->store('profile-photos', 'public');
         }
 
-        if ($user->email !== $data['email']) {
-            $user->email_verified_at = null;
+        // Sauvegarder la nouvelle photo
+        $file = $request->file('profile_photo');
+        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+        // Créer le dossier si nécessaire
+        $path = public_path('images/profile');
+        if (!file_exists($path)) {
+            mkdir($path, 0777, true);
         }
 
-        $user->fill($data);
-        $user->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        // Déplacer le fichier
+        $file->move($path, $filename);
+        $data['profile_photo'] = 'images/profile/' . $filename;
     }
+
+    // Mise à jour de l'email
+    if ($user->email !== $data['email']) {
+        $user->email_verified_at = null;
+    }
+
+    // Mise à jour des données
+    $user->fill($data);
+    $user->save();
+
+    return Redirect::route('profile.edit')->with('status', 'profile-updated');
+}
 
     public function destroy(Request $request): RedirectResponse
     {
