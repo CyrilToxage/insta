@@ -48,7 +48,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Nouvelles routes
         Route::get('/profile/{user}', 'show')->name('profile.show');
         Route::post('/profile/{user}/follow', 'follow')->name('profile.follow');
-        Route::post('/profile/{user}/unfollow', 'unfollow')->name('profile.unfollow');
     });
 
     // Route pour la recherche

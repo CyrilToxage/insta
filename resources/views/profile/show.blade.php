@@ -16,26 +16,15 @@
                             <div class="flex flex-col md:flex-row md:items-center mb-4">
                                 <h1 class="text-2xl font-semibold mb-2 md:mb-0 md:mr-6">{{ $user->username }}</h1>
 
-                                @if (Auth::id() === $user->id)
-                                    <a href="{{ route('profile.edit') }}"
-                                        class="px-4 py-2 bg-gray-100 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-200">
-                                        Modifier le profil
-                                    </a>
-                                @else
-                                    <form action="{{ route('profile.follow', $user) }}" method="POST" class="inline">
+                                @if (auth()->id() !== $user->id)
+                                    <form action="{{ route('profile.follow', $user) }}" method="POST">
                                         @csrf
-                                        @if (Auth::user()->following->contains($user))
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                class="px-4 py-2 bg-gray-100 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-200">
-                                                Ne plus suivre
-                                            </button>
-                                        @else
-                                            <button type="submit"
-                                                class="px-4 py-2 bg-blue-500 rounded-md text-sm font-semibold text-white hover:bg-blue-600">
-                                                Suivre
-                                            </button>
-                                        @endif
+                                        <button type="submit"
+                                            class="px-4 py-2 rounded-md {{ auth()->user()->following->contains($user)
+                                                ? 'bg-gray-200 hover:bg-gray-300'
+                                                : 'bg-blue-500 text-white hover:bg-blue-600' }}">
+                                            {{ auth()->user()->following->contains($user) ? 'Ne plus suivre' : 'Suivre' }}
+                                        </button>
                                     </form>
                                 @endif
                             </div>

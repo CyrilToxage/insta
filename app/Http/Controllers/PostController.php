@@ -13,14 +13,23 @@ class PostController extends Controller
         $following_ids = auth()->user()->following()->pluck('users.id');
         $following_ids->push(auth()->id());
 
-        $posts = Post::whereIn('user_id', $following_ids)
+        $followedPosts = Post::whereIn('user_id', $following_ids)
             ->with(['user', 'likes', 'comments'])
             ->latest()
-            ->paginate(10);
+            ->take(5)
+            ->get();
 
-        return view('posts.index', compact('posts'));
+        // Posts les plus likés (qui ne sont pas des utilisateurs suivis)
+        $popularPosts = Post::whereNotIn('user_id', $following_ids)
+            ->withCount('likes')
+            ->having('likes_count', '>', 0)
+            ->orderBy('likes_count', 'desc')
+            ->with(['user', 'likes', 'comments'])
+            ->take(5)
+            ->get();
+
+        return view('posts.index', compact('followedPosts', 'popularPosts'));
     }
-
     public function create()
     {
         return view('posts.create');

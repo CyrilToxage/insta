@@ -42,7 +42,7 @@ class ProfileController extends Controller
 
             // Stocke la nouvelle photo
             $data['profile_photo'] = $request->file('profile_photo')
-                                    ->store('profile-photos', 'public');
+                ->store('profile-photos', 'public');
         }
 
         if ($user->email !== $data['email']) {
@@ -76,13 +76,16 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 
-    public function follow(User $user): RedirectResponse
+    public function follow(User $user)
     {
-        if (Auth::id() === $user->id) {
+        // Ne peut pas se suivre soi-même
+        if (auth()->id() === $user->id) {
             return back();
         }
 
-        Auth::user()->following()->attach($user->id);
+        // Toggle le follow (follow si pas encore follow, unfollow si déjà follow)
+        auth()->user()->following()->toggle($user->id);
+
         return back();
     }
 
