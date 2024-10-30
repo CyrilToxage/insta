@@ -10,8 +10,8 @@
                         @foreach ($users as $user)
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
-                                    <img src="{{ $user->profile_photo ? Storage::url($user->profile_photo) : '/images/default-avatar.png' }}"
-                                        alt="Profile" class="w-10 h-10 rounded-full mr-3">
+                                    <img src="{{ $user->profile_photo ? asset($user->profile_photo) : asset('images/default-avatar.png') }}"
+                                        alt="Profile" class="w-10 h-10 rounded-full mr-3 object-cover">
                                     <div>
                                         <a href="{{ route('profile.show', $user) }}"
                                             class="font-semibold">{{ $user->name }}</a>

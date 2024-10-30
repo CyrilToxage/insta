@@ -7,8 +7,8 @@
                     <div class="flex flex-col md:flex-row items-center md:items-start">
                         {{-- Photo de profil --}}
                         <div class="mb-4 md:mb-0 md:mr-10">
-                            <img src="{{ $user->profile_photo ? Storage::url($user->profile_photo) : '/images/default-avatar.png' }}"
-                                alt="Photo de profil" class="w-32 h-32 rounded-full object-cover">
+                            <img src="{{ auth()->user()->profile_photo ? asset(auth()->user()->profile_photo) : asset('images/default-avatar.png') }}"
+                                alt="Profile" class="h-8 w-8 rounded-full object-cover">
                         </div>
 
                         {{-- Informations du profil --}}

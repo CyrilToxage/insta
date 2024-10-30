@@ -90,9 +90,18 @@ class PostController extends Controller
         return back()->with('status', 'Post supprimé avec succès!');
     }
 
-    public function like(Post $post)
+    public function like(Request $request, Post $post)
     {
         auth()->user()->likes()->toggle($post->id);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'liked' => auth()->user()->likes()->where('post_id', $post->id)->exists(),
+                'likesCount' => $post->likes()->count()
+            ]);
+        }
+
         return back();
     }
 }

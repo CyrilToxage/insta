@@ -29,8 +29,8 @@
                     <div class="space-y-4 max-h-96 overflow-y-auto mb-4">
                         @foreach ($post->comments as $comment)
                             <div class="flex items-start">
-                                <img src="{{ $comment->user->profile_photo ? Storage::url($comment->user->profile_photo) : '/images/default-avatar.png' }}"
-                                    alt="Profile" class="w-6 h-6 rounded-full mr-2">
+                                <img src="{{ $comment->user->profile_photo ? asset($comment->user->profile_photo) : asset('images/default-avatar.png') }}"
+                                    alt="Profile" class="w-6 h-6 rounded-full mr-2 object-cover">
                                 <div>
                                     <a href="{{ route('profile.show', $comment->user) }}"
                                         class="font-semibold">{{ $comment->user->name }}</a>

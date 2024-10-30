@@ -4,7 +4,6 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\SearchController;
-use App\Http\Controllers\FollowController;
 use Illuminate\Support\Facades\Route;
 
 // Page d'accueil pour les invités
@@ -24,6 +23,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Routes pour les posts
     Route::controller(PostController::class)->group(function () {
+        Route::get('/posts', function () {
+            return redirect()->route('home');
+        });
         Route::get('/posts/create', 'create')->name('posts.create');
         Route::post('/posts', 'store')->name('posts.store');
         Route::get('/posts/{post}', 'show')->name('posts.show');
@@ -56,4 +58,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Routes d'authentification (Breeze)
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
