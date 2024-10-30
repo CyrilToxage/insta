@@ -57,7 +57,7 @@
                 : asset('images/default-avatar.png') }}"
                  alt="Profile" class="w-8 h-8 rounded-full mr-3">
             <a href="{{ route('profile.show', $post->user) }}"
-               class="font-semibold">{{ $post->user->name }}</a>
+               class="font-semibold">{{ $post->user->username ?? $post->user->name }}</a>
         </div>
         @if(auth()->id() === $post->user_id)
             <div class="relative">
@@ -105,7 +105,7 @@
         @if($post->caption)
             <p class="mb-2">
                 <a href="{{ route('profile.show', $post->user) }}"
-                   class="font-semibold">{{ $post->user->name }}</a>
+                   class="font-semibold">{{ $post->user->username ?? $post->user->name }}</a>
                 {{ $post->caption }}
             </p>
         @endif

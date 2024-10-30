@@ -12,7 +12,7 @@
                             <img src="{{ $post->user->profile_photo ? asset($post->user->profile_photo) : asset('images/default-avatar.png') }}"
                                 alt="Profile" class="w-8 h-8 rounded-full mr-3">
                             <a href="{{ route('profile.show', $post->user) }}"
-                                class="font-semibold">{{ $post->user->name }}</a>
+                                class="font-semibold">{{ $post->user->username ?? $post->user->name }}</a>
                         </div>
                     </div>
 
@@ -20,7 +20,7 @@
                         <div class="mb-4">
                             <p>
                                 <a href="{{ route('profile.show', $post->user) }}"
-                                    class="font-semibold">{{ $post->user->name }}</a>
+                                    class="font-semibold">{{ $post->user->username ?? $post->user->name }}</a>
                                 {{ $post->caption }}
                             </p>
                         </div>
@@ -33,7 +33,7 @@
                                     alt="Profile" class="w-6 h-6 rounded-full mr-2 object-cover">
                                 <div>
                                     <a href="{{ route('profile.show', $comment->user) }}"
-                                        class="font-semibold">{{ $comment->user->name }}</a>
+                                        class="font-semibold">{{ $comment->user->username ?? $comment->user->name  }}</a>
                                     <span class="ml-2">{{ $comment->content }}</span>
                                     <p class="text-gray-500 text-xs">
                                         {{ $comment->created_at->diffForHumans() }}

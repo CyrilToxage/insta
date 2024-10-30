@@ -14,7 +14,7 @@
                                         alt="Profile" class="w-10 h-10 rounded-full mr-3 object-cover">
                                     <div>
                                         <a href="{{ route('profile.show', $user) }}"
-                                            class="font-semibold">{{ $user->name }}</a>
+                                            class="font-semibold">{{ $user->username ?? $user->name }}</a>
                                         @if ($user->bio)
                                             <p class="text-gray-500 text-sm">{{ Str::limit($user->bio, 50) }}</p>
                                         @endif
