@@ -83,17 +83,32 @@ class PostController extends Controller
 
     public function destroy(Post $post)
     {
-        // Vérifie si l'utilisateur est autorisé à supprimer ce post
         $this->authorize('delete', $post);
 
-        // Supprime l'image du post
-        if ($post->image) {
-            Storage::disk('public')->delete($post->image);
+        try {
+            // Récupérer le chemin de l'image
+            $imagePath = $post->image;
+
+            // Supprimer le post
+            $post->delete();
+
+            // Supprimer l'image physique
+            if ($imagePath) {
+                // Si l'image est dans le dossier public
+                $path = public_path($imagePath);
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+
+                // Pour plus de sécurité, essayer aussi dans storage si l'image y est
+                Storage::disk('public')->delete($imagePath);
+            }
+
+            return back()->with('status', 'Publication supprimée avec succès');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erreur lors de la suppression de la publication');
         }
-
-        $post->delete();
-
-        return back()->with('status', 'Post supprimé avec succès!');
     }
 
     public function like(Request $request, Post $post)
