@@ -52,12 +52,15 @@
     {{-- En-tête --}}
     <div class="p-4 border-b flex items-center justify-between">
         <div class="flex items-center">
-            <img src="{{ $post->user->profile_photo
-                ? asset($post->user->profile_photo)
-                : asset('images/default-avatar.png') }}"
-                 alt="Profile" class="w-8 h-8 rounded-full mr-3">
+            <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                <img src="{{ $post->user->profile_photo
+                    ? asset($post->user->profile_photo)
+                    : asset('images/default-avatar.png') }}"
+                     alt="Profile"
+                     class="w-full h-full object-cover">
+            </div>
             <a href="{{ route('profile.show', $post->user) }}"
-               class="font-semibold">{{ $post->user->username ?? $post->user->name }}</a>
+               class="font-semibold ml-3">{{ $post->user->username ?: $post->user->name }}</a>
         </div>
         @if(auth()->id() === $post->user_id)
             <div class="relative">
@@ -112,11 +115,11 @@
 
         <div class="space-y-2">
             <template x-for="comment in comments" :key="comment.id">
-                <p>
-                    <a :href="`/profile/${comment.user.id}`"
+                <p class="break-words">
+                    <a :href="'/profile/' + comment.user.id"
                        class="font-semibold"
-                       x-text="comment.user.name"></a>
-                    <span x-text="comment.content"></span>
+                       x-text="comment.user.username || comment.user.name"></a>
+                    <span class="whitespace-pre-line" x-text="comment.content"></span>
                 </p>
             </template>
 

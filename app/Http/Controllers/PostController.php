@@ -14,17 +14,19 @@ class PostController extends Controller
 
     public function index()
     {
+        // Récupère les IDs des utilisateurs suivis (sans inclure l'utilisateur actuel)
         $following_ids = auth()->user()->following()->pluck('users.id');
-        $following_ids->push(auth()->id());
 
+        // Posts des utilisateurs suivis uniquement
         $followedPosts = Post::whereIn('user_id', $following_ids)
             ->with(['user', 'likes', 'comments'])
             ->latest()
             ->take(5)
             ->get();
 
-        // Posts les plus likés (qui ne sont pas des utilisateurs suivis)
-        $popularPosts = Post::whereNotIn('user_id', $following_ids)
+        // Posts populaires (inclut tous les posts y compris ceux de l'utilisateur connecté)
+        // mais exclut ceux déjà affichés dans followedPosts
+        $popularPosts = Post::whereNotIn('id', $followedPosts->pluck('id'))
             ->withCount('likes')
             ->having('likes_count', '>', 0)
             ->orderBy('likes_count', 'desc')
