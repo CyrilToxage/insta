@@ -77,7 +77,7 @@
                         <form action="{{ route('comments.store', $post) }}" method="POST" class="flex space-x-2">
                             @csrf
                             <input type="text" name="content" placeholder="Ajouter un commentaire..."
-                                class="flex-1 border rounded-l px-3 py-1" required>
+                                class="flex-1 border rounded-l px-3 py-1 min-w-0" required>
                             <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded-r hover:bg-blue-600">
                                 Publier
                             </button>

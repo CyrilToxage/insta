@@ -87,18 +87,8 @@
         @endif
 
         <div class="space-y-2">
-            {{-- Commentaires statiques initiaux --}}
-            @foreach ($post->comments->take(2) as $comment)
+            <template x-for="comment in comments" :key="comment.id">
                 <p class="break-words">
-                    <a href="{{ route('profile.show', $comment->user) }}"
-                        class="font-semibold">{{ $comment->user->username ?: $comment->user->name }}</a>
-                    <span class="whitespace-pre-line">{{ $comment->content }}</span>
-                </p>
-            @endforeach
-
-            {{-- Template pour les nouveaux commentaires ajoutés dynamiquement --}}
-            <template x-for="comment in comments.slice(0, 2)" :key="comment.id">
-                <p class="break-words" x-show="!document.querySelector(`[data-comment-id='${comment.id}']`)">
                     <a :href="`/profile/${comment.user.id}`" class="font-semibold"
                         x-text="comment.user.username || comment.user.name"></a>
                     <span class="whitespace-pre-line" x-text="comment.content"></span>
