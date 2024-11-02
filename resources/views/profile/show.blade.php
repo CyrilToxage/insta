@@ -55,7 +55,6 @@
             </div>
 
             {{-- Publications --}}
-            {{-- Publications --}}
             @if ($posts->isNotEmpty())
                 <div class="grid grid-cols-3 gap-4">
                     @foreach ($posts as $post)
